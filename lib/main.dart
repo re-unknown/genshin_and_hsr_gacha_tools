@@ -47,14 +47,13 @@ class _MyAppState extends State<MainApp> {
                 ),
           backgroundColor: showgenshinWidget
               ? const Color.fromARGB(255, 127, 214, 255)
-              : const Color.fromARGB(255, 120, 99, 253),
+              : const Color.fromARGB(255, 157, 142, 252),
         ),
         body: Center(
           child: showgenshinWidget ? const genshinWidget() : const hsrWidget(),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: toggleWidget,
-          tooltip: 'Toggle Widget',
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
