@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'tools.dart';
 
 // ignore: camel_case_types
-
 class genshinWidget extends StatefulWidget {
   const genshinWidget({super.key});
 
