@@ -1,3 +1,6 @@
+
+# genshin_and_hsr_gacha_tools
+
 ## 機能
 
 このコードは、Flutterアプリケーション内で使用される2つの`ElevatedButton`ウィジェットのスタイルと動作を定義しています。
