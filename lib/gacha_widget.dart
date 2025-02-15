@@ -84,6 +84,7 @@ class GachaWidgetState extends State<GachaWidget> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
+                minimumSize: Size(150, 50), // ボタンの最小サイズを設定
               ),
               onPressed: () async {
                 if (isLoading) {
@@ -118,6 +119,7 @@ class GachaWidgetState extends State<GachaWidget> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
+                minimumSize: Size(150, 50), // ボタンの最小サイズを設定
               ),
               onPressed: () {
                 launchURL(Uri.parse(widget.importUrl));
