@@ -3,7 +3,9 @@ import 'tools.dart';
 
 // ignore: camel_case_types
 class genshinWidget extends StatefulWidget {
-  const genshinWidget({super.key});
+  final Function(String) addDebugMessage; // デバッグメッセージを追加するためのコールバック
+
+  const genshinWidget({super.key, required this.addDebugMessage});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -19,11 +21,12 @@ class _genshinwidgetState extends State<genshinWidget> {
 
   Future<void> _getgenshin(String url) async {
     String result = await myClassInstance.cmdFunction(url);
+    widget.addDebugMessage(result); // PowerShellの結果をデバッグメッセージに追加
     setState(() {
       _result = result ==
               'Cannot find the wish history url! Make sure to open the wish history first!'
           ? '祈願履歴が古い、もしくは開かれていません。\n履歴を開いて再度実行してください。'
-          : 'URLをクリップボードにコピーしました!\npaimon.moeに貼り付けてインポートしてください!';
+          : 'リンクをクリップボードにコピーしました!\npaimon.moeに貼り付けてインポートしてください!';
       textColor = result ==
               'Cannot find the wish history url! Make sure to open the wish history first!'
           ? Colors.red
@@ -71,11 +74,11 @@ class _genshinwidgetState extends State<genshinWidget> {
               },
               child: isLoading
                   ? const SizedBox(
-                      width: 20,
-                      height: 20,
+                      width: 30,
+                      height: 30,
                       child: CircularProgressIndicator(),
                     )
-                  : const Text('URLを取得する'),
+                  : const Text('1.リンクを取得する'),
             ),
             const SizedBox(width: 25),
             ElevatedButton(
@@ -88,7 +91,7 @@ class _genshinwidgetState extends State<genshinWidget> {
               onPressed: () {
                 launchURL(Uri.parse('https://paimon.moe/wish/import'));
               },
-              child: const Text('paimon.moeを開く'),
+              child: const Text('2.paimon.moeを開く'),
             ),
           ],
         ),

@@ -13,13 +13,13 @@ void launchURL(url) async {
 
 //ウィンドウサイズを変更
 const double windowWidth = 700;
-const double windowHeight = 500;
+const double windowHeight = 400;
 
 void setupWindow() {
   // webとプラットフォームをチェック
   if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     WidgetsFlutterBinding.ensureInitialized();
-    setWindowTitle('genshin and HSR gacha tools(原神&崩壊:スターレイル ガチャツール)');
+    setWindowTitle('原神 ガチャ履歴インポートツール');
     setWindowMinSize(const Size(windowWidth, windowHeight));
     setWindowMaxSize(const Size(windowWidth, windowHeight));
     getCurrentScreen().then((screen) {
@@ -30,6 +30,10 @@ void setupWindow() {
       ));
     });
   }
+}
+
+void updateWindowTitle(String game) {
+  setWindowTitle('$game ガチャ履歴インポートツール');
 }
 
 class RunScript {
@@ -47,7 +51,8 @@ class RunScript {
         workingDirectory: tempDir.path,
         environment: {'PSExecutionPolicyPreference': 'Bypass'});
     var textfull = await shell.run('powershell .\\getlink.ps1');
-    String result = textfull.outText.trim().split('\n').last;
-    return result;
+
+    // 全ての出力を返す
+    return textfull.outText.trim();
   }
 }

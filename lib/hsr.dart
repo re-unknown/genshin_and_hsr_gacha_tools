@@ -3,7 +3,9 @@ import 'tools.dart';
 
 // ignore: camel_case_types
 class hsrWidget extends StatefulWidget {
-  const hsrWidget({super.key});
+  final Function(String) addDebugMessage; // デバッグメッセージを追加するためのコールバック
+
+  const hsrWidget({super.key, required this.addDebugMessage});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -19,11 +21,12 @@ class _hsrwidgetState extends State<hsrWidget> {
 
   Future<void> _gethsr(String url) async {
     String result = await myClassInstance.cmdFunction(url);
+    widget.addDebugMessage(result); // PowerShellの結果をデバッグメッセージに追加
     setState(() {
       _result = result ==
               'Please make sure to open the Warp history before running the script.'
           ? 'ガチャ履歴が古い、もしくは開かれていません。\n履歴を開いて再度実行してください。'
-          : 'URLをクリップボードにコピーしました!\nSTARRAIL STATIONに貼り付けてインポートしてください!';
+          : 'リンクをクリップボードにコピーしました!\nSTARRAIL STATIONに貼り付けてインポートしてください!';
       textColor = result ==
               'Please make sure to open the Warp history before running the script.'
           ? Colors.red
@@ -71,11 +74,11 @@ class _hsrwidgetState extends State<hsrWidget> {
               },
               child: isLoading
                   ? const SizedBox(
-                      width: 20,
-                      height: 20,
+                      width: 30,
+                      height: 30,
                       child: CircularProgressIndicator(),
                     )
-                  : const Text('URLを取得する'),
+                  : const Text('1.リンクを取得する'),
             ),
             const SizedBox(width: 25),
             ElevatedButton(
@@ -89,7 +92,7 @@ class _hsrwidgetState extends State<hsrWidget> {
                 launchURL(
                     Uri.parse('https://starrailstation.com/jp/warp#import'));
               },
-              child: const Text('STARRAIL STATIONを開く'),
+              child: const Text('2.STARRAIL STATIONを開く'),
             ),
           ],
         ),
