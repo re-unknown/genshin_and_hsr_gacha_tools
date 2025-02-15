@@ -4,8 +4,7 @@ import 'gacha_widget.dart';
 class GenshinWidget extends StatelessWidget {
   final Function(String) addDebugMessage;
 
-  const GenshinWidget({Key? key, required this.addDebugMessage})
-      : super(key: key);
+  const GenshinWidget({super.key, required this.addDebugMessage});
 
   @override
   Widget build(BuildContext context) {

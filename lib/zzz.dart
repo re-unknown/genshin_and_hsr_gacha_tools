@@ -4,7 +4,7 @@ import 'gacha_widget.dart';
 class ZzzWidget extends StatelessWidget {
   final Function(String) addDebugMessage;
 
-  const ZzzWidget({Key? key, required this.addDebugMessage}) : super(key: key);
+  const ZzzWidget({super.key, required this.addDebugMessage});
 
   @override
   Widget build(BuildContext context) {

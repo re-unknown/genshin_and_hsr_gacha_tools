@@ -10,14 +10,14 @@ class GachaWidget extends StatefulWidget {
   final Function(String) addDebugMessage;
 
   const GachaWidget({
-    Key? key,
+    super.key,
     required this.siteName,
     required this.scriptUrl,
     required this.successMessage,
     required this.failureMessage,
     required this.importUrl,
     required this.addDebugMessage,
-  }) : super(key: key);
+  });
 
   @override
   GachaWidgetState createState() => GachaWidgetState();
