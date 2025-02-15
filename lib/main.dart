@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'tools.dart';
 import 'genshin.dart';
 import 'hsr.dart';
+import 'zzz.dart'; // ZZZウィジェットをインポート
 
 void main() {
   setupWindow();
@@ -9,24 +10,38 @@ void main() {
 }
 
 class MainApp extends StatefulWidget {
-  const MainApp({super.key});
+  const MainApp({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
-  _MyAppState createState() => _MyAppState();
+  MyAppState createState() => MyAppState();
 }
 
-class _MyAppState extends State<MainApp> {
-  bool showgenshinWidget = true;
-  List<String> debugMessages = []; // デバッグメッセージを保持するリスト
-  final ScrollController _scrollController = ScrollController(); // スクロールコントローラー
-  bool showDebugMessages = false; // デバッグメッセージの表示フラグ
+class MyAppState extends State<MainApp> {
+  bool showGenshinWidget = true;
+  bool showHsrWidget = false;
+  bool showZzzWidget = false; // ZZZウィジェットの表示状態
+  List<String> debugMessages = [];
+  final ScrollController _scrollController = ScrollController();
+  bool showDebugMessages = false;
 
   void toggleWidget() {
     setState(() {
-      showgenshinWidget = !showgenshinWidget; // Widgetを切り替え
-      // ウィンドウタイトルを現在のゲームウィジェットに合わせて変更
-      updateWindowTitle(showgenshinWidget ? '原神' : '崩壊:スターレイル');
+      if (showGenshinWidget) {
+        showGenshinWidget = false;
+        showHsrWidget = true;
+        showZzzWidget = false;
+        updateWindowTitle('崩壊:スターレイル');
+      } else if (showHsrWidget) {
+        showGenshinWidget = false;
+        showHsrWidget = false;
+        showZzzWidget = true;
+        updateWindowTitle('ZZZ');
+      } else {
+        showGenshinWidget = true;
+        showHsrWidget = false;
+        showZzzWidget = false;
+        updateWindowTitle('原神');
+      }
     });
   }
 
@@ -34,9 +49,7 @@ class _MyAppState extends State<MainApp> {
     setState(() {
       debugMessages.add(message);
     });
-    // スクロールを最下部に移動
     if (showDebugMessages) {
-      // デバッグメッセージが表示されている場合のみスクロール
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scrollController.hasClients) {
           _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -47,9 +60,8 @@ class _MyAppState extends State<MainApp> {
 
   void toggleDebugMessages() {
     setState(() {
-      showDebugMessages = !showDebugMessages; // デバッグメッセージの表示フラグを切り替え
+      showDebugMessages = !showDebugMessages;
     });
-    // デバッグメッセージが表示される場合、スクロールを最下部に移動
     if (showDebugMessages) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scrollController.hasClients) {
@@ -61,7 +73,7 @@ class _MyAppState extends State<MainApp> {
 
   @override
   void dispose() {
-    _scrollController.dispose(); // スクロールコントローラーを解放
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -71,36 +83,56 @@ class _MyAppState extends State<MainApp> {
       theme: ThemeData(
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
           sizeConstraints: BoxConstraints.tightFor(
-            width: 180.0, // 幅を指定
-            height: 50.0, // 高さを指定
+            width: 180.0,
+            height: 50.0,
           ),
         ),
       ),
       home: Scaffold(
         appBar: AppBar(
-          toolbarHeight: 40, // 高さを少し拡張
-          title: showgenshinWidget
-              ? const Text(
-                  '原神 ガチャ履歴インポートツール',
-                )
-              : const Text(
-                  '崩壊:スターレイル ガチャ履歴インポートツール',
-                ),
-          backgroundColor: showgenshinWidget
+          toolbarHeight: 40,
+          title: showGenshinWidget
+              ? const Text('原神 ガチャ履歴インポートツール')
+              : showHsrWidget
+                  ? const Text('崩壊:スターレイル ガチャ履歴インポートツール')
+                  : const Text('ZZZ ガチャ履歴インポートツール'),
+          backgroundColor: showGenshinWidget
               ? const Color.fromARGB(255, 127, 214, 255)
-              : const Color.fromARGB(255, 157, 142, 252),
+              : showHsrWidget
+                  ? const Color.fromARGB(255, 157, 142, 252)
+                  : const Color.fromARGB(255, 255, 172, 63), // ZZZ用の色
           actions: [
             TextButton(
-              onPressed: toggleWidget, // Widgetを切り替える
+              onPressed: () {
+                toggleDebugMessages(); // 表示状態を切り替え
+                if (showDebugMessages) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (_scrollController.hasClients) {
+                      _scrollController
+                          .jumpTo(_scrollController.position.maxScrollExtent);
+                    }
+                  });
+                }
+              },
+              child: const Text(
+                'デバッグ',
+                style: TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            ),
+            const SizedBox(width: 5),
+            TextButton(
+              onPressed: toggleWidget,
               child: Row(
                 children: [
-                  const Icon(Icons.swap_horiz,
-                      color: Colors.white, size: 24), // アイコン
-                  const SizedBox(width: 8), // アイコンとテキストの間にスペースを追加
+                  const Icon(Icons.swap_horiz, color: Colors.white, size: 24),
+                  const SizedBox(width: 4),
                   Text(
-                    showgenshinWidget ? 'HSR' : '原神',
-                    style: const TextStyle(
-                        color: Colors.white, fontSize: 24), // テキストの色を白に設定
+                    showGenshinWidget
+                        ? 'HSR'
+                        : showHsrWidget
+                            ? 'ZZZ'
+                            : '原神',
+                    style: const TextStyle(color: Colors.white, fontSize: 24),
                   ),
                 ],
               ),
@@ -111,26 +143,23 @@ class _MyAppState extends State<MainApp> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              showgenshinWidget
-                  ? genshinWidget(addDebugMessage: addDebugMessage)
-                  : hsrWidget(addDebugMessage: addDebugMessage),
-              const SizedBox(height: 20),
-              // デバッグメッセージを表示するボタン
-              ElevatedButton(
-                onPressed: toggleDebugMessages,
-                child:
-                    Text(showDebugMessages ? 'デバッグメッセージを隠す' : 'デバッグメッセージを表示'),
-              ),
-              const SizedBox(height: 20),
-              // デバッグメッセージを表示
-              if (showDebugMessages) // フラグに基づいて表示
+              if (showGenshinWidget)
+                GenshinWidget(addDebugMessage: addDebugMessage),
+              if (showHsrWidget) HsrWidget(addDebugMessage: addDebugMessage),
+              if (showZzzWidget)
+                ZzzWidget(addDebugMessage: addDebugMessage), // ZZZウィジェットを表示
+              const SizedBox(height: 10),
+              if (showDebugMessages)
                 Expanded(
-                  child: ListView.builder(
-                    controller: _scrollController, // スクロールコントローラーを設定
-                    itemCount: debugMessages.length,
-                    itemBuilder: (context, index) {
-                      return Text(debugMessages[index]);
-                    },
+                  child: Container(
+                    color: Colors.grey[200], // 薄い灰色
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      itemCount: debugMessages.length,
+                      itemBuilder: (context, index) {
+                        return Text(debugMessages[index]);
+                      },
+                    ),
                   ),
                 ),
             ],

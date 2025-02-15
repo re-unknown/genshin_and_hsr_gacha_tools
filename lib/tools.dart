@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:process_run/shell.dart';
 import 'dart:io';
 
+const String ver = 'v2.0.0';
+
 void launchURL(url) async {
   if (!await launchUrl(url)) {
     throw Exception('Could not launch $url');
@@ -12,7 +14,7 @@ void launchURL(url) async {
 }
 
 //ウィンドウサイズを変更
-const double windowWidth = 700;
+const double windowWidth = 750;
 const double windowHeight = 400;
 
 void setupWindow() {
@@ -33,13 +35,20 @@ void setupWindow() {
 }
 
 void updateWindowTitle(String game) {
-  setWindowTitle('$game ガチャ履歴インポートツール');
+  setWindowTitle('$game ガチャ履歴インポートツール $ver');
 }
 
 class RunScript {
-  get textColor => null;
+  bool isCancelled = false; // キャンセルフラグ
+  Shell? shell; // Shellインスタンスを保持
+
+  void cancel() {
+    isCancelled = true; // キャンセルフラグを立てる
+    shell?.kill(); // Shellの処理をキャンセル
+  }
 
   Future<String> cmdFunction(var wishurl) async {
+    isCancelled = false; // 初期化
     var wishUrl = wishurl;
     var tempDir = await Directory.systemTemp.createTemp('process_run_example');
     var scriptFile = File('${tempDir.path}/getlink.ps1');
@@ -47,12 +56,30 @@ class RunScript {
     var response = await request.close();
     await scriptFile
         .writeAsBytes(await response.expand((chunk) => chunk).toList());
-    var shell = Shell(
-        workingDirectory: tempDir.path,
-        environment: {'PSExecutionPolicyPreference': 'Bypass'});
-    var textfull = await shell.run('powershell .\\getlink.ps1');
 
-    // 全ての出力を返す
-    return textfull.outText.trim();
+    shell = Shell(
+      workingDirectory: tempDir.path,
+      environment: {'PSExecutionPolicyPreference': 'Bypass'},
+    );
+
+    // スクリプトの実行前にキャンセルされたか確認
+    if (isCancelled) return '処理がキャンセルされました';
+
+    try {
+      var textfull = await shell!.run('powershell .\\getlink.ps1');
+
+      // キャンセルされた場合は処理を中断
+      if (isCancelled) return '処理がキャンセルされました';
+
+      // 全ての出力を返す
+      return textfull.outText.trim();
+    } catch (e) {
+      // ShellExceptionをキャッチして適切なメッセージを返す
+      if (e is ShellException) {
+        return '処理がキャンセルされました: ${e.message}';
+      }
+      // その他の例外を再スロー
+      rethrow;
+    }
   }
 }
